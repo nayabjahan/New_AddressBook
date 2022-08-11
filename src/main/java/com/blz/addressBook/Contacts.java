@@ -9,15 +9,15 @@ public class Contacts {
     private String phoneNo;
     private String eMail;
 
-    public Contacts() {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.city = city;
-        this.state = state;
-        this.zip = zip;
-        this.phoneNo = phoneNo;
-        this.eMail = eMail;
-    }
+//    public Contacts() {
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.city = city;
+//        this.state = state;
+//        this.zip = zip;
+//        this.phoneNo = phoneNo;
+//        this.eMail = eMail;
+//    }
 
     @Override
     public String toString() {
