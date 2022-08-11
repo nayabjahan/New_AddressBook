@@ -6,6 +6,6 @@ public class AddressBookMain {
         Contacts contact = new Contacts();
         AddressBook addressBook = new AddressBook();
         addressBook.addContacts();
-        addressBook.editContact();      //calling editContacts Function from addressbook.
+        addressBook.deleteContact();
     }
 }
