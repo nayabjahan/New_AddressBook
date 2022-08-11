@@ -5,6 +5,7 @@ public class AddressBookMain {
         System.out.println("welcome to Address Book ");
         Contacts contact = new Contacts();
         AddressBook addressBook = new AddressBook();
-        addressBook.addContacts();      //calling addContacts Function from addressbook.
+        addressBook.addContacts();
+        addressBook.editContact();      //calling editContacts Function from addressbook.
     }
 }
