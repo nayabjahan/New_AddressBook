@@ -19,7 +19,7 @@ public class AddressBook {
         System.out.println("enter the phone number");
         contacts.setPhoneNo(scanner.nextLine());
         System.out.println("enter the eMail");
-        contacts.seteMail(scanner.nextLine());
+        contacts.setEMail(scanner.nextLine());
     }
     public void editContact(){
             Scanner scanner = new Scanner(System.in);
@@ -41,7 +41,7 @@ public class AddressBook {
                 System.out.println("Enter the Phone Number :");
                 contacts.setPhoneNo(scanner.next());
                 System.out.println("Enter the EMail ID :");
-                contacts.seteMail(scanner.next());
+                contacts.setEMail(scanner.next());
             }else if (!isFound) {
                 System.out.println("Contact is Not found ");
             }
