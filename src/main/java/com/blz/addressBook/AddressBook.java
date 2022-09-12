@@ -1,247 +1,365 @@
 package com.blz.addressBook;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class AddressBook extends ArrayList<Contacts> {
-    static Dictionary dictCity = new Hashtable<String, ArrayList<Contacts>>();
-    static Dictionary dictState = new Hashtable<String, ArrayList<Contacts>>();
-    private static final int ADDRESSBOOK = 1;
-    private static final int EDIT_ADDRESSBOOK = 2;
-    private static final int DISPLAY_ADDRESSBOOK = 3;
-    private static final int EXIT = 6;
-    private static final int SEARCH_BY_PERSONCITY = 4;
-    private static final int SEARCH_BY_PERSONCITY_BY_PERSONSTATE = 5;
-    HashMap<String, ArrayList<Contacts>> addressBookMap = new HashMap<String, ArrayList<Contacts>>();
-    static ArrayList<Contacts> contactList = new ArrayList<Contacts>();
-    Contacts contacts;
-    static Scanner scanner = new Scanner(System.in);
+public class AddressBook {
+        List<Contacts> ContactDetails = new ArrayList<>();
+          static Scanner input = new Scanner(System.in);
+         static HashMap<String, AddressBook> dictAddressBook = new HashMap<>();//
+         static Dictionary dictCity = new Hashtable<String, ArrayList<Contacts>>();
+         static Dictionary dictState = new Hashtable<String, ArrayList<Contacts>>();
 
-    public Contacts addContact() {
-        System.out.println("Enter the First Name :");
-        String fName = scanner.nextLine();
 
-        System.out.println("Enter the Last Name :");
-        String lName = scanner.nextLine();
-
-        System.out.println("Enter the City :");
-        String city = scanner.nextLine();
-
-        System.out.println("Enter the State :");
-        String state = scanner.nextLine();
-
-        System.out.println("Enter the Phone Number :");
-        String phName = scanner.nextLine();
-
-        System.out.println("Enter the Zip Code :");
-        String zipCode = scanner.nextLine();
-
-        System.out.println("Enter the E-Mail :");
-        String EMail = scanner.nextLine();
-
-        contactList.add(new Contacts(fName, lName, city, state, phName, zipCode, EMail));
-        return contacts;
-    }
-
-    public void showContacts() {
-        for (Contacts contacts : contactList) {
-            System.out.println("Contacts{" +
-                                       "firstName='" + contacts.getFirstName() + '\'' +
-                                       ", lastName='" + contacts.getLastName() + '\'' +
-                                       ", city='" + contacts.getCity() + '\'' +
-                                       ", state='" + contacts.getState() + '\'' +
-                                       ", zipCode='" + contacts.getZipCode() + '\'' +
-                                       ", phNumber='" + contacts.getPhNumber() + '\'' +
-                                       ", eMail='" + contacts.getEMail() + '\'' +
-                                       '}');
+        public Contacts readContactDetail() {
+            Contacts personContact = new Contacts();
+            System.out.println("Enter Contact Details");
+            System.out.println("----------------------");
+            Scanner in = new Scanner(System.in);
+            System.out.print("Enter First Name: ");
+            personContact.setFirstName(in.next());
+            System.out.print("Enter Last Name: ");
+            personContact.setLastName(in.next());
+            System.out.print("Enter City: ");
+            personContact.setCity(in.next());
+            System.out.print("Enter State: ");
+            personContact.setState(in.next());
+            System.out.print("Enter Zip: ");
+            personContact.setZipCode(in.next());
+            System.out.print("Enter Phone number: ");
+            personContact.setPhNumber(in.next());
+            System.out.print("Enter Email Id: ");
+            personContact.setEMail(in.next());
+            return personContact;
         }
-        System.out.println(addressBookMap);
-       // contactList.stream().sorted(Comparator.comparing(Contacts::getFirstName)).forEach(System.out::println);
-    }
 
-    public void editContact() {
-
-        System.out.println("Enter the first name");
-        String firstName = scanner.next();
-        boolean isAvailable = false;
-
-        for (Contacts contacts : contactList) {
-            if (firstName.equalsIgnoreCase(contacts.getFirstName())) {
-                isAvailable = true;
-                System.out.println("Enter the New First Name");
-                contacts.setFirstName(scanner.next());
-                System.out.println("Enter the Last Name :");
-                contacts.setLastName(scanner.next());
-                System.out.println("Enter the City :");
-                contacts.setCity(scanner.next());
-                System.out.println("Enter the State :");
-                contacts.setState(scanner.next());
-                System.out.println("Enter the Zip Code :");
-                contacts.setZipCode(scanner.next());
-                System.out.println("Enter the Phone Number :");
-                contacts.setPhNumber(scanner.next());
-                System.out.println("Enter the EMail ID :");
-                contacts.setEMail(scanner.next());
-                break;
+        public void addContactDetail() {
+            boolean flag = false;
+            Contacts personDetails = readContactDetail();
+            for (Contacts objPerson : ContactDetails) {
+                if (objPerson.getFirstName().equals(personDetails.getFirstName())) {
+                    flag = true;
+                }
+            }
+            if (!flag) {
+                ContactDetails.add(personDetails);
+                storePersonByCity(personDetails.getCity(), personDetails);//call store person details by city name
+                storePersonByState(personDetails.getState(), personDetails);//call store person details by state name
+            } else {
+                System.out.println("First Name already exist..");
             }
         }
-        if (!isAvailable) {
-            System.out.println("Contact is Not found ");
-        }
-    }
 
-    public void deleteContact() {
-        System.out.println("Enter the first name");
-        String firstName = scanner.next();
-
-        boolean isAvailable = false;
-        for (Contacts contacts : contactList) {
-            if (firstName.equalsIgnoreCase(contacts.getFirstName())) {
-                isAvailable = true;
-                System.out.println("Contact Deleted ");
-                contacts = null;
+        //store persons detail in dict by city name
+        //@SuppressWarnings("unchecked")
+        public void storePersonByCity(String cityName, Contacts personObject) {
+            while (dictCity.keys().hasMoreElements()) {
+                if (dictCity.keys().nextElement().equals(cityName)) {
+                    ArrayList<Contacts> personDetailsArray = (ArrayList<Contacts>) dictCity.get(cityName);
+                    personDetailsArray.add(personObject);
+                    dictCity.put(cityName, personDetailsArray);
+                    return;
+                } else break;
             }
+            ArrayList<Contacts> personDetailsArray = new ArrayList<>();
+            personDetailsArray.add(personObject);
+            dictCity.put(cityName, personDetailsArray);
         }
-        if (!isAvailable) {
-            System.out.println("Contact Name Not found ");
+
+        //store persons detail in dict by state name
+        @SuppressWarnings("unchecked")
+        public void storePersonByState(String stateName, Contacts personObject) {
+            while (dictState.keys().hasMoreElements()) {
+                if (dictState.keys().nextElement().equals(stateName)) {
+                    ArrayList<Contacts> personDetailsArray = (ArrayList<Contacts>) dictState.get(stateName);
+                    personDetailsArray.add(personObject);
+                    dictState.put(stateName, personDetailsArray);
+                    return;
+                } else break;
+            }
+            ArrayList<Contacts> personDetailsArray = new ArrayList<>();
+            personDetailsArray.add(personObject);
+            dictState.put(stateName, personDetailsArray);
         }
-    }
 
+        public void editContactDetail(String firstName) {
+            if (ContactDetails.isEmpty()) {
+                System.out.println("------NO RECORDS------");
+                return;
+            }
 
-    public void addNewAddressBook() {
-        System.out.println("Enter the Address Book Name  : ");
-        String addressBookName = scanner.next();
-        if (addressBookMap.containsKey(addressBookName)) {
-            System.out.println("Entered AddressBook is Already Available");
-            return;
-        }
-        contactList = new ArrayList<>();
-        addressBookMap.put(addressBookName, contactList);
-        System.out.println(addressBookName);
-    }
-//    public void duplicateEntry() {
-//        boolean flag = false;
-//        Contacts contact = addContact();
-//        try {
-//            for (Contacts objPerson : contactList) {
-//                if (objPerson.getFirstName().equals(contact.getFirstName())) {
-//                    //flag = true;
-//                    System.out.println(contact);
-//                }
-//            }
-//            if (!flag) {
-//                contactList.add(contact);
-//            } else {
-//                System.out.println("First Name already exist..");
-//            }
-//        }catch (NullPointerException e){
-//            e.printStackTrace();
-//        }
-//    }
-
-    public void addressBookMenu() {
-        System.out.println("Welcome TO Address Book");
-        boolean flag = false;
-        int choice;
-        do {
-            String bookName = "";
-            ArrayList<Contacts> addressBook = new ArrayList<Contacts>();
-            choice = inputInteger("1.Add a New Address Book \n 2.Edit Address Book \n 3. Display Address Book \n 4.search by person city" +
-                                          "\n 5.search by person state \n 6.exit");
-            switch (choice) {
-                case ADDRESSBOOK:
-                    addNewAddressBook();
+            boolean flag = false;
+            Contacts newPersonContact = null;
+            for (Contacts objPerson : ContactDetails) {
+                if (objPerson.getFirstName().equals(firstName)) {
+                    newPersonContact = objPerson;
+                    flag = true;
                     break;
-                case EDIT_ADDRESSBOOK:
-                    if (!addressBookMap.isEmpty()) {
-                        bookName = inputString("Enter Address Book Name to Access: ");
-                        addressBook = addressBookMap.get(bookName);
-                        menu(bookName, addressBook);
-                    } else {
-                        System.out.println("No Address Books are present");
+                }
+            }
+
+            if (flag) {
+                int choice;
+                do {
+                    System.out.println("---------------------------");
+                    System.out.println("What you want to edit");
+                    System.out.println("1. First Name\n2. Last Name\n3. Address\n4. City\n5. State\n6. Zip\n7. Phone Number\n8. Email Id\n0. Cancel\n");
+                    System.out.print("Enter choice: ");
+                    Scanner in = new Scanner(System.in);
+                    choice = in.nextInt();
+                    //use switch for edit specific details
+                    switch (choice) {
+                        case 1:
+                            System.out.println("Old: " + newPersonContact.getFirstName());
+                            System.out.print("New: ");
+                            String newFirstName = in.next();
+                            newPersonContact.setFirstName(newFirstName);
+                            break;
+
+                        case 2:
+                            System.out.println("Old: " + newPersonContact.getLastName());
+                            System.out.print("New: ");
+                            String newLastName = in.next();
+                            newPersonContact.setLastName(newLastName);
+                            break;
+                        case 3:
+                            System.out.println("Old: " + newPersonContact.getCity());
+                            System.out.print("New: ");
+                            String newCity = in.next();
+                            newPersonContact.setCity(newCity);
+                            break;
+                        case 4:
+                            System.out.println("Old: " + newPersonContact.getState());
+                            System.out.print("New: ");
+                            String newState = in.next();
+                            newPersonContact.setState(newState);
+                            break;
+                        case 5:
+                            System.out.println("Old: " + newPersonContact.getZipCode());
+                            System.out.print("New: ");
+                            String newZip = in.next();
+                            newPersonContact.setZipCode(newZip);
+                            break;
+                        case 6:
+                            System.out.println("Old: " + newPersonContact.getPhNumber());
+                            System.out.print("New: ");
+                            String newPhone = in.next();
+                            newPersonContact.setPhNumber(newPhone);
+                            break;
+                        case 7:
+                            System.out.println("Old: " + newPersonContact.getEMail());
+                            System.out.print("New: ");
+                            String newEmail = in.next();
+                            newPersonContact.setEMail(newEmail);
+                            break;
+                        case 0:
+                            break;
+                        default:
+                            System.out.println("invalid option....");
+                            break;
                     }
-                    break;
-                case DISPLAY_ADDRESSBOOK:
-                    displayBooks();
-                    break;
-                case SEARCH_BY_PERSONCITY:
-                    searchPersonCity();
-                    break;
-                case SEARCH_BY_PERSONCITY_BY_PERSONSTATE:
-                    searchPersonState();
-                    break;
-                case EXIT:
-                    System.out.println("Thanks For Using!");
+                } while (choice != 0);
+
+
+            } else {
+                System.out.println("First name doesn't exist");
+            }
+        }
+
+        public void deleteContactDetail(String firstName) {
+            boolean flag = false;
+            if (ContactDetails.isEmpty()) {
+                System.out.println("------NO RECORDS------");
+                return;
+            }
+            for (Contacts objPerson : ContactDetails) {
+                if (objPerson.getFirstName().equals(firstName)) {
+                    ContactDetails.remove(objPerson);
                     flag = true;
                     break;
+                }
             }
-        } while (!flag);
-    }
-
-    public void menu(String bookName, ArrayList<Contacts> addressBook) {
-        System.out.println("Welcome To Address Book Programme");
-
-        boolean flag = false;
-        int choice;
-        do {
-            System.out.println("Kindly Enter choice \n 1. Add new Contact \n 2. Edit Contact details \n 3. Delete" +
-                                       "\n 4. Display Contacts \n 5. Exit ");
-
-            choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    //duplicateEntry();
-                    addContact();
-                    System.out.println("Contact Added Successfully!!");
-                    break;
-                case 2:
-                    editContact();
-                    System.out.println("Contact Edited Successfully!!");
-                    break;
-                case 3:
-                    deleteContact();
-                    System.out.println("Contact Deleted Successfully!!");
-                    break;
-                case 4:
-                    showContacts();
-                    break;
-                case 5:
-                    System.out.println("Thanks For Using");
-                    flag = true;
-                    break;
-                default:
-                    System.out.println("Please Enter the correct Choice");
+            if (flag) {
+                System.out.println("Record Deleted..");
+            } else {
+                System.out.println("First name doesn't exist");
             }
-        } while (!flag);
+        }
 
-    }
+        //display contact details
+        public void displayContactDetails() {
+            if (ContactDetails.isEmpty()) {//check list are empty or not
+                System.out.println("------NO RECORDS------");
+                return;
+            }
 
-    public static String inputString(String message) {
-        System.out.println(message);
-        return scanner.next().toLowerCase();
-    }
+            for (Contacts objPerson : ContactDetails) {
+                System.out.println("--------------------------");
+                objPerson.displayPersonContactDetails();
+                System.out.println("--------------------------");
+            }
+        }
 
-    public static int inputInteger(String message) {
-        System.out.println(message);
-        return scanner.nextInt();
-    }
 
-    public void displayBooks() {
-        for (Map.Entry<String, ArrayList<Contacts>> books : addressBookMap.entrySet())
-                System.out.println("BookName = " + books.getKey() + ", Contacts = " + books.getValue());
-    }
-    public static void searchPersonCity() {
-        System.out.println("Enter City name");
-        String city = scanner.next();
-        contactList.stream().filter(person -> person.getCity().equalsIgnoreCase(city)).forEach(System.out::println);
-    }
+        public static String inputString(String message) {
+            System.out.println(message);
+            return input.next().toLowerCase();
+        }
 
-    public static void searchPersonState() {
-        System.out.println("Enter State name");
-        String state = scanner.next();
-        contactList.stream().filter(person -> person.getState().equalsIgnoreCase(state)).forEach(System.out::println);
-    }
+        public static int inputInteger(String message) {
+            System.out.println(message);
+            return input.nextInt();
+        }
+
+        public  char inputChar(String message) {
+            System.out.println(message);
+            return input.next().toUpperCase().charAt(0);
+        }
+
+        public static void displayBooks() {
+            for (String books : dictAddressBook.keySet()) {
+                System.out.println(books);
+            }
+        }
+
+        public static void displayNames(AddressBook addressBook) {
+            System.out.print("First Names: ");
+            for (Contacts objPerson : addressBook.ContactDetails
+            ) {
+                System.out.print(objPerson.getFirstName() + ", ");
+            }
+            System.out.println();
+        }
+
+        public static void userOperation(String bookName, AddressBook addressBook) {
+            int choice = 0;
+            do {
+                System.out.println("--------------------------");
+                System.out.println("Accessing: " + bookName);
+                System.out.println("1. Add Person Details\n2. Display Details\n3. Edit Detail\n4. Delete Detail\n0. Exit");
+                choice = inputInteger("Enter Choice: ");
+                switch (choice) {
+                    case 1:
+                        assert addressBook != null;
+                        addressBook.addContactDetail();
+                        break;
+                    case 2:
+                        addressBook.displayContactDetails();
+                        break;
+                    case 3:
+                        displayNames(addressBook);
+                        String fNameEdit = inputString("Enter First Name: ");
+                        addressBook.editContactDetail(fNameEdit);
+                        break;
+                    case 4:
+                        String fNameDelete = inputString("Enter First Name to delete: ");
+                        addressBook.deleteContactDetail(fNameDelete);
+                        break;
+                    case 0:
+                        break;
+                    default:
+                        System.out.println("Invalid input...");
+                }
+            } while (choice != 0);
+        }
+
+        public static void addressBookMenu() {
+            int ch;
+            System.out.println("Welcome to Address Book");
+            do {
+                String bookName = "";
+                AddressBook addressBook = new AddressBook();
+                ch = inputInteger("1. Create New book\n2. Edit Existing book\n" +
+                                          "3. Edit Global Contact\n4. search by city \n5. search by state\n6.view by city\n7.view by State\n(0 to Close)");
+                switch (ch) {
+                    case 1:
+                        bookName = inputString("Enter New Address Book Name: ");
+                        dictAddressBook.put(bookName, addressBook);
+                        userOperation(bookName, addressBook);
+                        break;
+
+                    case 2:
+                        if (!dictAddressBook.isEmpty()) {
+                            displayBooks();
+                            bookName = inputString("Enter Address Book Name to Access: ");
+                            addressBook = dictAddressBook.get(bookName);
+                            userOperation(bookName, addressBook);
+                        } else {
+                            System.out.println("No Address Books are present");
+                        }
+                        break;
+                    case 3:
+                        if (!dictAddressBook.isEmpty()) {
+                            String personName = inputString("Enter Person Name to edit: ");
+                            editGlobalContact(personName);
+                        } else {
+                            System.out.println("No Address Books are present");
+                        }
+                        break;
+                    case 4:
+                        searchPersonCity();
+                        break;
+                    case 5:
+                        searchPersonState();
+                        break;
+                    case 6:
+                        System.out.println("Enter City name");
+                        String city = input.next();
+                        viewPersonCity(city);
+                        break;
+                    case 7:
+                        System.out.println("Enter State name");
+                        String state = input.next();
+                       viewPersonState(state);
+                       break;
+
+                }
+            } while (ch != 0);
+        }
+
+        public static void editGlobalContact(String personName) {
+            boolean flag = false;
+            for (AddressBook addressBook : dictAddressBook.values()) {
+                for (Contacts listContactDetail : addressBook.ContactDetails
+                ) {
+                    if (listContactDetail.getFirstName().equals(personName)) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag) {
+                    addressBook.editContactDetail(personName);
+                    break;
+                }
+            }
+        }
+
+        public static void searchPersonCity() {
+            System.out.println("Enter City name");
+            String city = input.next();
+            dictAddressBook.values().forEach(book -> book.ContactDetails.stream().filter(person -> person.getCity().equalsIgnoreCase(city)).forEach(System.out::println));
+        }
+
+        public static void searchPersonState() {
+            System.out.println("Enter State name");
+            String state = input.next();
+            dictAddressBook.values().forEach(book -> book.ContactDetails.stream().filter(person -> person.getState().equalsIgnoreCase(state)).forEach(System.out::println));
+
+        }
+
+       public static void viewPersonCity(String city) {
+           ArrayList<Contacts> personDetails = (ArrayList<Contacts>) dictCity.get(city);
+           Map<Contacts, Long> result = personDetails.stream().collect(Collectors.groupingBy(Function.identity(),Collectors.counting()));
+           System.out.println(result);
+        }
+
+       public static void viewPersonState(String state) {
+           ArrayList<Contacts> personDetails = (ArrayList<Contacts>) dictState.get(state);
+           Map<Contacts, Long> result = personDetails.stream().collect(Collectors.groupingBy(Function.identity(),Collectors.counting()));
+           System.out.println(result);
+       }
+
   }
 
 
