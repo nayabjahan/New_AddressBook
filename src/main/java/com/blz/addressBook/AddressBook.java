@@ -271,7 +271,8 @@ public class AddressBook {
                 String bookName = "";
                 AddressBook addressBook = new AddressBook();
                 ch = inputInteger("1. Create New book\n2. Edit Existing book\n" +
-                                          "3. Edit Global Contact\n4. search by city \n5. search by state\n6.view by city\n7.view by State\n(0 to Close)");
+                                          "3. Edit Global Contact\n4. search by city \n5. search by state\n6.view by city\n7.view by State \n8.Count by City \n9. Count by State" +
+                                          "\n(0 to Close)");
                 switch (ch) {
                     case 1:
                         bookName = inputString("Enter New Address Book Name: ");
@@ -313,6 +314,16 @@ public class AddressBook {
                         String state = input.next();
                        viewPersonState(state);
                        break;
+                    case 8:
+                        System.out.println("Enter city name");
+                        String cityToCount = input.next();
+                        countPersonByCity(cityToCount);
+                        break;
+                    case 9:
+                        System.out.println("Enter state name");
+                        String stateToCount = input.next();
+                        countPersonByState(stateToCount);
+                        break;
 
                 }
             } while (ch != 0);
@@ -359,6 +370,17 @@ public class AddressBook {
            Map<Contacts, Long> result = personDetails.stream().collect(Collectors.groupingBy(Function.identity(),Collectors.counting()));
            System.out.println(result);
        }
+    public static void countPersonByCity(String city) {
+        ArrayList<Contacts> personDetails = (ArrayList<Contacts>) dictCity.get(city);
+        int count = (int) personDetails.stream().count();
+        System.out.println("city: " + city + " are " + count);
+    }
+
+    public static void countPersonByState(String state) {
+        ArrayList<Contacts> personDetails = (ArrayList<Contacts>) dictCity.get(state);
+        int count = (int) personDetails.stream().count();
+        System.out.println("city: " + state + " are " + count);
+    }
 
   }
 
